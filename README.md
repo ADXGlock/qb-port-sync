@@ -211,29 +211,6 @@ docker run --rm \
 
 ---
 
-## 🧰 Build Locally
-
-```bash
-git clone https://github.com/ADXGlock/qb-port-sync.git
-cd qb-port-sync
-docker build -t adxglock/qb-port-sync:latest .
-```
-
----
-
-## 📦 DockerHub Auto-Build
-
-This repo includes a GitHub Actions workflow that:
-- Builds and pushes multi-arch Docker images (`amd64` and `arm64`)
-- Tags builds automatically (`latest` and version tags)
-- Runs on every push to `main` or tag like `v1.0.0`
-
-You just need two GitHub Secrets:
-- `DOCKERHUB_USERNAME`
-- `DOCKERHUB_TOKEN`
-
----
-
 ## 🧑‍💻 Maintainer
 
 **Author:** ADXGlock  
