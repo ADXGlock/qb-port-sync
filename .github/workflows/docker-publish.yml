@@ -33,3 +33,10 @@ jobs:
           tags: |
             adxglock/qb-port-sync:latest
             adxglock/qb-port-sync:${{ github.run_number }}
+      - name: Update DockerHub description
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: adxglock/qb-port-sync
+          readme-filepath: ./README.md
