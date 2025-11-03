@@ -230,7 +230,7 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 If you find this project helpful:
 - ⭐ Star it on [GitHub](https://github.com/ADXGlock/qb-port-sync)
 - 🐋 Pull it from [DockerHub](https://hub.docker.com/r/adxglock/qb-port-sync)
-- ☕ Buy me coffee [Buy Me A Coffee](https://buymeacoffee.com/adxglock))
+- ☕ Buy me coffee [Buy Me A Coffee](https://buymeacoffee.com/adxglock)
 
 ---
 
