@@ -32,8 +32,8 @@ jobs:
         push: true
         platforms: linux/amd64,linux/arm64
         tags: |
-          adxglock/qb-port-sync:latest
           adxglock/qb-port-sync:${{ github.run_number }}
+          adxglock/qb-port-sync:latest
 
     - name: Update DockerHub description
       uses: peter-evans/dockerhub-description@v4
