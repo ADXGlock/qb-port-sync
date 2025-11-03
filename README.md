@@ -236,7 +236,7 @@ You just need two GitHub Secrets:
 
 ## 🧑‍💻 Maintainer
 
-**Author:** Ty E. Tidwell  
+**Author:** ADXGlock  
 **GitHub:** [ADXGlock](https://github.com/ADXGlock)  
 **DockerHub:** [adxglock](https://hub.docker.com/r/adxglock/qb-port-sync)
 
