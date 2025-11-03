@@ -1,1 +1,128 @@
+services:
+  gluetun:
+    image: qmcgaw/gluetun:latest
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - 8888:8888/tcp # HTTP proxy
+      - 8388:8388/tcp # Shadowsocks
+      - 8388:8388/udp # Shadowsocks
+      - 8000:8000 # required for Gluetun API access
+      # Other services
+      # qBittorrent
+      - 9092:9092  # qBittorrent Web UI
+      #- 6881:6881 #torrenting port  Not needed if using qBittorrent with network_mode: "service:gluetun"
+      #- 6881:6881/udp #torrenting port  Mpt needed if using qBittorrent with network_mode: "service:gluetun"
+      # Other containers that are being routed via the container where you still want access the resources like web ui on local network
+    networks:
+      internal:
+      web:
+    volumes:
+      - /configs/gluetun:/gluetun
+    environment:
+      # I specify the PUID and PGID but this is optional (default is 1000,1000), description from Wiki "User ID/Group ID to run as non root and for ownership of files written"
+      - PUID=1001
+      - PGID=100
+      - UMASK=002
+      - TZ=America/New_York
+      # See https://github.com/qdm12/gluetun-wiki/tree/main/setup#setup
+      #- VPN_SERVICE_PROVIDER=custom
+      - VPN_SERVICE_PROVIDER=protonvpn
+      - VPN_TYPE=wireguard
+      # OpenVPN:
+      #- OPENVPN_USER=
+      #- OPENVPN_PASSWORD=
+      # Wireguard:
+      #- WIREGUARD_PUBLIC_KEY="Daer24dSnQMoGm/LIDjPbKgrlUjF0ldjiDA9dfe+EXk="
+      #- WIREGUARD_PRIVATE_KEY="2PQELfYggxzvppKFkj68FKPYBSSQwea6roE5T/0CP0M="
+      - WIREGUARD_PRIVATE_KEY=XXXXXXXXXXXXXXXXXX
+      - SERVER_COUNTRIES=United States
+      - PORT_FORWARD_ONLY=on
+      #- WIREGUARD_ADDRESSES=10.2.0.2/32
+      #- VPN_ENDPOINT_IP=146.70.202.130 # "Endpoint" under [Peer] in WG Config
+      #- VPN_ENDPOINT_PORT=51820 # should be the default 51820 but can confirm by seeing the port after IP in "Endpoint"
+      #- VPN_DNS_ADDRESS=DNS = 10.2.0.1 # "DNS" under [Interface] in WG Config
+      - VPN_PORT_FORWARDING=on
+      - VPN_PORT_FORWARDING_PROVIDER=protonvpn
+      # Server list updater
+      # See https://github.com/qdm12/gluetun-wiki/blob/main/setup/servers.md#update-the-vpn-servers-list
+      - UPDATER_PERIOD=24h
+      - HTTP_CONTROL_SERVER_USER=admin
+      - HTTP_CONTROL_SERVER_PASSWORD=password
+    labels:
+      - "com.centurylinklabs.watchtower.enable=True"
+    restart: unless-stopped
 
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    network_mode: "service:gluetun"
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    environment:
+      - PUID=1001
+      - PGID=100
+      - UMASK=002
+      - TZ=America/New_York
+      - WEBUI_PORT=9092
+      #- TORRENTING_PORT=6881
+    volumes:
+      - /configs/qbittorrent:/config
+      - /downloads:/downloads #optional
+      - /media:/media #optional for uploading
+    labels:
+      - "com.centurylinklabs.watchtower.enable=True"
+    healthcheck:
+      test: curl --fail http://ifconfig.me/ || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+      #test: "ifconfig | grep -q eth0"
+      #interval: 1m
+      #timeout: 30s
+      #retries: 0
+    restart: unless-stopped
+
+  qb-port-sync:
+    #build: ./qb-port-sync
+    image: adxglock/qb-port-snyc:latest
+    container_name: qb-port-sync
+    network_mode: "service:gluetun"
+    depends_on:
+      gluetun:
+        condition: service_healthy
+      qbittorrent:
+        condition: service_healthy
+    environment:
+      - PUID=1001
+      - PGID=100
+      - TZ=America/New_York
+      - GLUETUN_API=http://localhost:8000/v1/openvpn/portforwarded
+      - GLUETUN_USER=admin
+      - GLUETUN_PASS=password
+      - QBITTORRENT_HOST=http://localhost:9092
+      - QBITTORRENT_USER=admin
+      - QBITTORRENT_PASS=adminadmin
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - "com.centurylinklabs.watchtower.enable=True"
+    healthcheck:
+      test: curl --fail http://ifconfig.me/ || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+networks:
+  internal:
+    external: true
+    name: internal
+  web:
+    external: true
+    name: web
