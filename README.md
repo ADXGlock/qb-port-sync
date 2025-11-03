@@ -122,7 +122,7 @@ services:
 
   qb-port-sync:
     #build: ./qb-port-sync
-    image: adxglock/qb-port-snyc:latest
+    image: adxglock/qb-port-sync:latest
     container_name: qb-port-sync
     network_mode: "service:gluetun"
     depends_on:
