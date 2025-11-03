@@ -131,9 +131,6 @@ services:
       qbittorrent:
         condition: service_healthy
     environment:
-      - PUID=1001
-      - PGID=100
-      - TZ=America/New_York
       - GLUETUN_API=http://localhost:8000/v1/openvpn/portforwarded
       - GLUETUN_USER=admin
       - GLUETUN_PASS=password
