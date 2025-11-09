@@ -141,12 +141,12 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
       - "com.centurylinklabs.watchtower.enable=True"
-    healthcheck:
-      test: curl --fail http://ifconfig.me/ || exit 1
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
+#    healthcheck:  #HEALTHCHECK ADDED INTO DOCKERFILE
+#      test: curl --fail http://ifconfig.me/ || exit 1
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
+#      start_period: 60s
     restart: unless-stopped
 networks:
   internal:
