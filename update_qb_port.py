@@ -51,7 +51,7 @@ def set_qbittorrent_port(port):
             "password": QBITTORRENT_PASS
         })
 
-        if login_response.status_code != 200:
+        if login_response.status_code not in (200, 204):
             print(f"[ERROR] Login to qBittorrent failed: {login_response.status_code} - {login_response.text}", flush=True)
             return
 
